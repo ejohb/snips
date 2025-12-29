@@ -1,0 +1,14 @@
+#!/bin/bash
+
+USB_PORT="/sys/bus/usb/devices/1-1"
+DELAY=30
+
+if [ ! -d "$USB_PORT" ]; then
+    echo "USB port empty. Rebooting in $DELAY seconds..."
+    echo "Press Ctrl+C to cancel."
+    sleep $DELAY
+    systemctl reboot
+else
+    echo "USB device detected. Starting VLC Telnet..."
+    exec ./vlc-tn
+fi
