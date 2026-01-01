@@ -1,20 +1,45 @@
 #!/bin/bash
 
+set -ex
+
+
+
 . parse-args "$@"
+
+# Default values
+ARCH=${ARCH:-amd64}         # used for platform & labels
+DISTRO=${DISTRO:-debian}
+IMAGE_ARCH="$ARCH"
+
+# For IMAGE naming, convert arm64 -> aarch64
+if [ "$ARCH" = "arm64" ]; then
+    IMAGE_ARCH="aarch64"
+fi
+
+IMAGE="${IMAGE_ARCH}-base"
+
+# Append distro to IMAGE if not alpine
+if [ "$DISTRO" != "alpine" ]; then
+    IMAGE="${IMAGE}-${DISTRO}"
+fi
 
 docker buildx build . \
   --progress=plain \
-  --no-cache \
-  --tag da51adea/amd64-addon-amniotic:$VERSION \
+  --tag "da51adea/${ARCH}-addon-amniotic:$VERSION" \
   --file /opt/dev/repo/amniotic/ha/addon/Dockerfile \
-  --platform linux/amd64 \
+  --platform "linux/$ARCH" \
   --pull \
-  --label io.hass.version=$VERSION \
-  --label io.hass.arch=amd64 \
+  --label io.hass.version="$VERSION" \
+  --label io.hass.arch="$ARCH" \
   --label io.hass.type=addon \
   --label io.hass.name=Amniotic \
   --label io.hass.description="A multi-output ambient sound mixer for Home Assistant" \
   --label io.hass.url=https://fmtr.link/amniotic \
-  --build-arg BUILD_FROM=ghcr.io/home-assistant/amd64-base:latest \
-  --build-arg BUILD_VERSION=$VERSION \
-  --build-arg BUILD_ARCH=amd64
+  --build-arg BUILD_FROM="ghcr.io/home-assistant/$IMAGE:latest" \
+  --build-arg BUILD_VERSION="$VERSION" \
+  --build-arg BUILD_ARCH="$ARCH" \
+  --load
+
+
+
+docker run -it "da51adea/${ARCH}-addon-amniotic:$VERSION"

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker --context ha exec -it addon_da51adea_amniotic /bin/bash
