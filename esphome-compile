@@ -1,0 +1,19 @@
+#!/bin/bash
+. parse-args "$@"
+set -euo pipefail
+set -x
+
+BASEDIR="/tmp/esphome"
+mkdir -p "$BASEDIR"
+WORKDIR="$BASEDIR/work"
+PLATFORMIO_DIR="$BASEDIR/platformio"
+
+CMD="compile /work/config.yaml" # run /config/config.yaml --device ${NAME}.lan
+
+docker run --rm -it --network host \
+  -e HOME=/tmp \
+  -e NAME -e FRIENDLY -e PASSWORD -e PASSWORD_RECOVERY \
+  -v "$FILE":/work/config.yaml:ro \
+  -v "$WORKDIR":/work \
+  -v "$PLATFORMIO_DIR":/tmp/.platformio \
+  ghcr.io/esphome/esphome $CMD
