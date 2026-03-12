@@ -1,0 +1,9 @@
+#!/bin/bash
+
+. parse-args "$@"
+
+gio mount -u -a
+pkill -f gvfsd
+pkill -f gvfsd-sftp
+nautilus -q
+nohup nautilus >/dev/null 2>&1 &
